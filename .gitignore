@@ -1,0 +1,31 @@
+# Ignore Visual Studio temporary files, build results, and
+# build directories
+*.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.ide/
+*.cache/
+*.obj/
+*.bin/
+*.log
+
+# Ignore .NET files
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Ignore build output directories
+bin/
+obj/
+
+# Ignore temporary files
+*.log
+*.temp
+
+# Ignore files related to Git
+.git/
+
+# Ignore secrets
+secrets.json
