@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using BlogAPI.Dto;
+using BlogAPI.Dto.OtherObjects;
 using BlogAPI.Interface;
 using BlogAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlogAPI.Controllers
@@ -20,6 +22,7 @@ namespace BlogAPI.Controllers
         }
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Blog>))]
+        [Authorize(Roles = StaticUserRoles.ADMIN)]
 
         public IActionResult GetBlogs()
         {
@@ -32,6 +35,7 @@ namespace BlogAPI.Controllers
         [HttpGet("blogId/{blogId}")]
         [ProducesResponseType(200, Type = typeof(Blog))]
         [ProducesResponseType(400)]
+        [Authorize(Roles = StaticUserRoles.ADMIN)]
         public IActionResult GetBlog(int blogId)
         {
             if (!_blogRepository.BlogExists(blogId))
@@ -50,6 +54,7 @@ namespace BlogAPI.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
+        [Authorize(Roles =StaticUserRoles.USER)]
         public IActionResult CreateBlog([FromBody] BlogDto blogCreate)
         {
             if (blogCreate == null)
@@ -79,6 +84,7 @@ namespace BlogAPI.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
+        [Authorize(Roles = StaticUserRoles.USER)]
         public IActionResult UpdateBlog(int blogId, [FromBody] BlogDto updatedBlog)
         {
             if (updatedBlog == null)
@@ -114,6 +120,7 @@ namespace BlogAPI.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
+        [Authorize(Roles =StaticUserRoles.OWNER)]
         public IActionResult DeleteBlog(int blogId)
         {
             if (!_blogRepository.BlogExists(blogId))
