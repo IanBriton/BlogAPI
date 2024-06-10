@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using BlogAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddSingleton<ITokenBlacklist, TokenBlacklist>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -58,7 +60,7 @@ builder.Services
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-            ValidAudience  = builder.Configuration["JWT:ValidAudience"],
+            ValidAudience = builder.Configuration["JWT:ValidAudience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
         };
     });
@@ -73,11 +75,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    
 }
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware(typeof(TokenBlacklistMiddleware));
 
 app.MapControllers();
 

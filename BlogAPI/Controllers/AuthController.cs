@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using BlogAPI.Interface;
 
 namespace BlogAPI.Controllers
 {
@@ -17,12 +18,14 @@ namespace BlogAPI.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AuthController> _logger;
+        private readonly ITokenBlacklist _tokenBlacklist;
 
-        public AuthController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, ILogger<AuthController> logger)
+        public AuthController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, ILogger<AuthController> logger, ITokenBlacklist tokenBlacklist)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _tokenBlacklist = tokenBlacklist;
             _logger = logger;
         }
 
@@ -144,6 +147,11 @@ namespace BlogAPI.Controllers
         [Route("logout")]
         public IActionResult Logout()
         {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer", "");
+            
+            //Blacklisting the token
+            _tokenBlacklist.BlacklistToken(token);
+            
             _logger.LogInformation("User logged out at {Time}", DateTime.UtcNow);
             return NoContent();
         }
